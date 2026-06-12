@@ -1,0 +1,145 @@
+# ============================================================
+# security-scan.yml — Latin Shop
+# Escaneo de seguridad programado (semanal) + manual
+# Incluye: Trivy (imagen Docker) + composer audit + OWASP check
+# ============================================================
+name: Security Scan
+
+on:
+  schedule:
+    # Todos los lunes a las 08:00 UTC
+    - cron: "0 8 * * 1"
+  # Permite ejecución manual
+  workflow_dispatch:
+
+jobs:
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 1: Trivy — Escaneo de vulnerabilidades en imagen Docker
+  # ────────────────────────────────────────────────────────────
+  trivy-image:
+    name: "Trivy — Imagen Docker"
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write  # Para subir resultados al Security tab
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build imagen para escanear
+        run: |
+          docker build \
+            --build-arg APP_ENV=production \
+            -t latinshop:scan-${{ github.sha }} \
+            .
+
+      - name: Escanear con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "latinshop:scan-${{ github.sha }}"
+          format: "sarif"
+          output: "trivy-image.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "0"   # No romper el build, solo reportar
+
+      - name: Subir resultados al Security tab de GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-image.sarif"
+          category: "trivy-docker"
+
+      - name: Resumen de vulnerabilidades
+        run: |
+          echo "## 🔐 Trivy — Imagen Docker" >> $GITHUB_STEP_SUMMARY
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --format table \
+            "latinshop:scan-${{ github.sha }}" \
+            >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 2: Trivy — Escaneo del filesystem (código fuente)
+  # ────────────────────────────────────────────────────────────
+  trivy-fs:
+    name: "Trivy — Código fuente"
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Escanear filesystem con Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-fs.sarif"
+          severity: "CRITICAL,HIGH,MEDIUM"
+          exit-code: "0"
+          skip-dirs: "vendor,node_modules,frontend/assets"
+
+      - name: Subir resultados
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-fs.sarif"
+          category: "trivy-filesystem"
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 3: Composer audit (CVEs en dependencias PHP)
+  # ────────────────────────────────────────────────────────────
+  composer-audit:
+    name: "Composer — Audit CVEs"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Auditar dependencias
+        id: audit
+        run: |
+          echo "## 📦 Composer Audit" >> $GITHUB_STEP_SUMMARY
+          composer audit --format=plain 2>&1 | tee audit_output.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat audit_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Fallar si hay CVEs críticos
+        run: |
+          # composer audit devuelve exit code != 0 si hay vulnerabilidades
+          composer audit
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 4: Verificar secretos expuestos (Gitleaks)
+  # ────────────────────────────────────────────────────────────
+  secrets-scan:
+    name: "Gitleaks — Secretos expuestos"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (con historial completo para escanear commits)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Escanear con Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

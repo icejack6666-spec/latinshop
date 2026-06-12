@@ -1,0 +1,50 @@
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+
+# Dependencias de desarrollo
+vendor/
+node_modules/
+
+# Logs locales
+logs/
+*.log
+
+# Backups
+backups/
+*.sql
+*.sql.gz
+
+# Cache local
+cache/
+*.cache
+
+# Variables de entorno locales (la imagen usa --env-file)
+.env
+.env.local
+.env.*.local
+
+# Documentación
+README.md
+docs/
+
+# Tests
+tests/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

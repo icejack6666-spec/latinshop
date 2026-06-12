@@ -1,0 +1,33 @@
+# ============================================================
+# CRONTAB — LatinShop Backups Automáticos
+# ============================================================
+# Editar con: crontab -e   (como el usuario del servidor web)
+# Ajusta la ruta /var/www/html/latinshop/ según tu servidor.
+#
+# IMPORTANTE: El script backup.php NO requiere Apache/nginx.
+# Corre directamente con PHP CLI y usa el mismo config.php.
+# ============================================================
+
+# ── Backup completo diario (02:00 AM hora México) ──────────
+0 2 * * * /usr/bin/php /var/www/html/latinshop/scripts/backup.php full >> /var/log/latinshop_backup.log 2>&1
+
+# ── Solo DB cada 6 horas ───────────────────────────────────
+# 0 */6 * * * /usr/bin/php /var/www/html/latinshop/scripts/backup.php db >> /var/log/latinshop_backup.log 2>&1
+
+# ── Purga de backups antiguos (lunes 03:00 AM) ────────────
+0 3 * * 1 /usr/bin/php /var/www/html/latinshop/scripts/backup.php purge >> /var/log/latinshop_backup.log 2>&1
+
+# ── Backup solo de archivos (domingos 04:00 AM) ────────────
+# 0 4 * * 0 /usr/bin/php /var/www/html/latinshop/scripts/backup.php files >> /var/log/latinshop_backup.log 2>&1
+
+# ============================================================
+# DOCKER: si usas docker-compose, agrega en docker-compose.yml:
+#
+#   cron:
+#     image: php:8.3-cli
+#     volumes:
+#       - .:/var/www/html/latinshop
+#     command: >
+#       sh -c "echo '0 2 * * * php /var/www/html/latinshop/scripts/backup.php full'
+#              | crontab - && crond -f"
+# ============================================================

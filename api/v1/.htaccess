@@ -1,0 +1,24 @@
+# ============================================================
+# api/v1/.htaccess
+# Enruta todas las peticiones a /api/v1/* → index.php
+# ============================================================
+
+Options -Indexes
+
+# Deshabilitar acceso directo a archivos PHP de endpoints
+<FilesMatch "^(?!index).*\.php$">
+    Require all denied
+</FilesMatch>
+
+RewriteEngine On
+
+# Pasar el header Authorization (algunos servers lo eliminan)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Si el archivo o directorio existe, servirlo directamente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirigir todo lo demás a index.php
+RewriteRule ^ index.php [L,QSA]

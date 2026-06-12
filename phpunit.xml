@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    phpunit.xml — Latin Shop
+    Configuración para PHPUnit 11 (compatible con PHPUnit 9+ en fallback)
+
+    Ejecutar:
+        vendor/bin/phpunit              → todos los tests
+        vendor/bin/phpunit -\-testsuite Unit
+        vendor/bin/phpunit -\-filter SecurityTest
+        vendor/bin/phpunit -\-coverage-html coverage/
+-->
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    beStrictAboutOutputDuringTests="true"
+    failOnWarning="true"
+    failOnRisky="true"
+    displayDetailsOnTestsThatTriggerWarnings="true"
+    displayDetailsOnTestsThatTriggerDeprecations="true"
+    cacheDirectory=".phpunit.cache"
+>
+    
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">includes</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>tests</directory>
+        </exclude>
+    </source>
+
+    <php>
+        <const name="LATINSHOP"       value="1"/>
+        <const name="ENV"             value="testing"/>
+        <const name="SITE_URL"        value="http://localhost"/>
+        <const name="SITE_NAME"       value="Latin Shop Test"/>
+        <const name="ROOT_PATH"       value="."/>
+        <const name="INCLUDES_PATH"   value="./includes"/>
+        <const name="PAGES_PATH"      value="./pages"/>
+        <const name="ASSETS_PATH"     value="./frontend/assets"/>
+        <const name="ASSETS_URL"      value="http://localhost/assets"/>
+        <const name="DB_HOST"         value="localhost"/>
+        <const name="DB_NAME"         value=":memory:"/>
+        <const name="DB_USER"         value="root"/>
+        <const name="DB_PASS"         value=""/>
+        <const name="DB_CHARSET"      value="utf8mb4"/>
+        <const name="CSRF_TOKEN_LENGTH" value="32"/>
+        <const name="SESSION_LIFETIME"  value="1800"/>
+    </php>
+</phpunit>

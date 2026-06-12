@@ -1,0 +1,22 @@
+# ============================================================
+# docker-compose.override.yml — Desarrollo local
+# Se combina automáticamente con docker-compose.yml
+# ============================================================
+services:
+
+  app:
+    build:
+      args:
+        APP_ENV: development
+    environment:
+      APP_ENV: development
+    volumes:
+      # En desarrollo montamos el código en tiempo real (lectura/escritura)
+      - ./:/var/www/html
+      - latinshop_storage:/var/www/storage
+      - ./logs:/var/www/html/logs
+    ports:
+      - "8080:80"
+
+  phpmyadmin:
+    profiles: []   # En desarrollo siempre disponible (quitar profile)

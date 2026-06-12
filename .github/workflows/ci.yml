@@ -1,0 +1,162 @@
+# ============================================================
+# ci.yml — Latin Shop CI
+# Ejecuta en: push a cualquier rama + pull_requests
+# Pasos: syntax check · PSR-12 lint · security audit
+# ============================================================
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 1: Sintaxis PHP 8.3
+  # ────────────────────────────────────────────────────────────
+  syntax:
+    name: "PHP 8.3 — Sintaxis"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo, pdo_mysql, gd, zip, intl, mbstring, opcache, redis
+          coverage: none
+
+      - name: Verificar sintaxis (todos los .php)
+        run: |
+          echo "🔍 Verificando sintaxis PHP en todos los archivos..."
+          ERRORS=0
+          while IFS= read -r file; do
+            if ! php -l "$file" > /dev/null 2>&1; then
+              echo "❌ Error de sintaxis: $file"
+              php -l "$file"
+              ERRORS=$((ERRORS+1))
+            fi
+          done < <(find . -name "*.php" \
+            -not -path "./vendor/*" \
+            -not -path "./.git/*")
+
+          if [ $ERRORS -gt 0 ]; then
+            echo "❌ Se encontraron $ERRORS errores de sintaxis."
+            exit 1
+          fi
+          echo "✅ Sintaxis correcta en todos los archivos PHP."
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 2: PSR-12 Code Style (PHP_CodeSniffer)
+  # ────────────────────────────────────────────────────────────
+  codestyle:
+    name: "PSR-12 — Code Style"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: phpcs
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Ejecutar PHPCS (PSR-12)
+        run: |
+          phpcs \
+            --standard=PSR12 \
+            --extensions=php \
+            --ignore=vendor/,frontend/ \
+            --report=full \
+            --colors \
+            . || true
+          # 'true' para no bloquear el pipeline en warnings,
+          # solo errores críticos rompen el build (ajustar con --error-severity)
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 3: Auditoría de seguridad (composer audit)
+  # ────────────────────────────────────────────────────────────
+  security:
+    name: "Seguridad — Composer Audit"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-audit-${{ hashFiles('composer.lock') }}
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Auditar vulnerabilidades en dependencias
+        run: |
+          echo "🔐 Auditando dependencias Composer..."
+          composer audit --format=plain
+
+  # ────────────────────────────────────────────────────────────
+  # JOB 4: PHPStan análisis estático
+  # ────────────────────────────────────────────────────────────
+  static-analysis:
+    name: "PHPStan — Análisis estático"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo, pdo_mysql, gd, zip, intl, mbstring
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-stan-${{ hashFiles('composer.lock') }}
+
+      - name: Instalar dependencias (con dev)
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Ejecutar PHPStan (nivel 5)
+        run: |
+          if [ -f vendor/bin/phpstan ]; then
+            vendor/bin/phpstan analyse \
+              --level=5 \
+              --no-progress \
+              includes/ config/ \
+              --memory-limit=256M
+          else
+            echo "⚠️  PHPStan no instalado. Agrega phpstan/phpstan al composer.json."
+          fi

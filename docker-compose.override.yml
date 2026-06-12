@@ -1,0 +1,19 @@
+
+services:
+
+  app:
+    build:
+      args:
+        APP_ENV: development
+    environment:
+      APP_ENV: development
+    volumes:
+      
+      - ./:/var/www/html
+      - latinshop_storage:/var/www/storage
+      - ./logs:/var/www/html/logs
+    ports:
+      - "8080:80"
+
+  phpmyadmin:
+    profiles: []   

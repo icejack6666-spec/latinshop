@@ -1,0 +1,29 @@
+parameters:
+    # Nivel 5 es un buen equilibrio entre rigor y falsos positivos
+    # en proyectos sin framework con clases globales
+    level: 5
+
+    paths:
+        - includes
+        - config
+        - pages
+
+    excludePaths:
+        - vendor
+        - frontend
+        - includes/phpmailer
+
+    # La app usa constantes globales definidas en config/config.php
+    # PHPStan necesita saber que existen
+    bootstrapFiles:
+        - tests/bootstrap-stan.php
+
+    ignoreErrors:
+        # Clases instanciadas sin autoloader (patrón del proyecto)
+        - '#Call to an undefined method Database::#'
+        # Variables de sesión dinámicas
+        - '#Variable \$_SESSION#'
+
+    # Reportar clases no encontradas como warning, no error
+    # (el proyecto no usa autoloader para sus propias clases)
+    reportUnmatchedIgnoredErrors: false

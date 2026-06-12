@@ -1,0 +1,97 @@
+/* ============================================================
+   LAZY-LOAD.CSS — Latin Shop
+   Animaciones y placeholders para carga diferida de imágenes.
+   ============================================================ */
+
+/* ─── ESTADO BASE: imagen no cargada ────────────────────────────────────────── */
+
+img.ls-lazy,
+img.ls-native-lazy {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    /* Placeholder gris con shimmer mientras carga */
+    background: linear-gradient(
+        90deg,
+        var(--tbt-bg-2, #1a1a2e) 25%,
+        var(--tbt-bg-3, #242438) 50%,
+        var(--tbt-bg-2, #1a1a2e) 75%
+    );
+    background-size: 200% 100%;
+    animation: ls-shimmer 1.4s ease infinite;
+}
+
+/* ─── ESTADO CARGADO: fade-in ────────────────────────────────────────────────── */
+
+img.ls-lazy--loaded,
+img.ls-native-lazy.ls-lazy--loaded {
+    opacity: 1;
+    animation: none;
+    background: none;
+}
+
+/* ─── ESTADO ERROR ───────────────────────────────────────────────────────────── */
+
+img.ls-lazy--error {
+    opacity: 0.35;
+    animation: none;
+    /* Icono de imagen rota vía CSS */
+    background: var(--tbt-bg-3, #242438)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E")
+        center / 40px no-repeat;
+}
+
+/* ─── BACKGROUND LAZY ────────────────────────────────────────────────────────── */
+
+.ls-lazy-bg {
+    background-color: var(--tbt-bg-2, #1a1a2e);
+    transition: opacity 0.4s ease, background-image 0.4s ease;
+}
+
+.ls-lazy-bg.ls-lazy--loaded {
+    animation: none;
+}
+
+/* ─── SHIMMER ANIMATION ──────────────────────────────────────────────────────── */
+
+@keyframes ls-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ─── STAGGER (cascada en grids) ─────────────────────────────────────────────── */
+
+.ls-stagger {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+        opacity  0.4s ease,
+        transform 0.4s ease;
+    /* transition-delay se aplica via JS por posición en fila */
+}
+
+.ls-stagger--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ─── PLACEHOLDERS ESPECÍFICOS POR CONTEXTO ──────────────────────────────────── */
+
+/* Tarjetas de cuentas */
+.cuenta-card__img.ls-lazy {
+    min-height: 180px;
+    border-radius: var(--tbt-r-lg, 10px);
+}
+
+
+/* ─── REDUCIR MOVIMIENTO (accesibilidad) ─────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    img.ls-lazy,
+    img.ls-native-lazy,
+    .ls-stagger {
+        animation: none !important;
+        transition: opacity 0.1s ease !important;
+        transform: none !important;
+    }
+    .ls-stagger { opacity: 1; }
+}
