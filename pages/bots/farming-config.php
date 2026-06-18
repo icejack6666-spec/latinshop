@@ -633,7 +633,7 @@ include INCLUDES_PATH . '/header.php';
 <!-- JS del selector de vendedor — mismo archivo que ya usa bot-farming.php -->
 <script src="<?= ASSETS_URL ?>/js/bot-farming-vendedor.js" defer></script>
 
-<script <?= csp_nonce() ?>>
+<script <?= csp_nonce_attr() ?>>
 var QUESTIONS = [
     {id:1,  label:'Banco',             type:'text',     cond_parent_id:null, cond_value:null},
     {id:2,  label:'Escudo',            type:'radio',    cond_parent_id:null, cond_value:null},
@@ -757,13 +757,6 @@ function farmEnviar() {
     var answers = collectAnswers();
     var waMsg   = buildWAMessage(answers, vendedor.nombre);
 
-    try {
-        fetch('<?= u('/bots/farming-save') ?>', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers: answers, vendedor: vendedor.nombre, vendedor_wa: vendedor.wa })
-        });
-    } catch(e) {}
 
     document.getElementById('farm-success').style.display = 'block';
     document.getElementById('farm-success').scrollIntoView({ behavior: 'smooth' });

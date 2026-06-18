@@ -521,26 +521,13 @@ class BackupService
                 'type'        => $type,
                 'filename'    => basename($path),
                 'size'        => $size,
-                'size_human'  => $this->formatBytes($size),
+                'size_human' => format_bytes($size),
                 'created_at'  => date('Y-m-d H:i:s', (int) filemtime($path)),
                 'path'        => $path,
             ];
         }
     }
 
-    private function formatBytes(int $bytes): string
-    {
-        if ($bytes >= 1_073_741_824) {
-            return round($bytes / 1_073_741_824, 2) . ' GB';
-        }
-        if ($bytes >= 1_048_576) {
-            return round($bytes / 1_048_576, 2) . ' MB';
-        }
-        if ($bytes >= 1024) {
-            return round($bytes / 1024, 2) . ' KB';
-        }
-        return $bytes . ' B';
-    }
 
     private function writeLog(string $type, bool $success, array $details): void
     {

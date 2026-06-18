@@ -4,17 +4,17 @@
     /* ── Service Worker ─────────────────────────────────────── */
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/latinshop/service-worker.js')
+            navigator.serviceWorker.register('/service-worker.js')
                 .then(reg => console.log('[PWA] SW registrado:', reg.scope))
                 .catch(err => console.warn('[PWA] SW error:', err));
         });
     }
 
-    /* ── Si ya está instalada como app, no hacer nada ───────── */
+    /* ── Evitar si ya está instalada ────────────────────────── */
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
                       || window.navigator.standalone === true;
-    if (isStandalone) return;
 
+    if (isStandalone) return;
     if (localStorage.getItem('pwa-installed')) return;
 
     /* ── Detección de plataforma ─────────────────────────────── */
@@ -26,7 +26,7 @@
 
     let deferredPrompt = null;
 
-    /* ── Elementos existentes del DOM ───────────────────────── */
+    /* ── Elementos DOM ───────────────────────────────────────── */
     const banner     = document.getElementById('pwa-install-banner');
     const btnInstall = document.getElementById('pwa-btn-install');
     const btnDismiss = document.getElementById('pwa-btn-dismiss');
@@ -34,7 +34,7 @@
     const modalBody  = document.getElementById('pwa-modal-body');
     const modalClose = document.getElementById('pwa-modal-close');
 
-    /* ── Botón flotante fijo (FAB) ───────────────────────────── */
+    /* ── FAB CSS ─────────────────────────────────────────────── */
     const fabCSS = document.createElement('style');
     fabCSS.textContent = `
         #pwa-fab {
@@ -52,7 +52,6 @@
             border-radius: 50px;
             font-size: .82rem;
             font-weight: 700;
-            letter-spacing: .04em;
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(232,96,44,.5);
             transition: opacity .2s, transform .2s;
@@ -60,7 +59,7 @@
             font-family: sans-serif;
         }
         #pwa-fab:hover { opacity:.9; transform:translateY(-2px); }
-        #pwa-fab.show  { display: flex; }
+        #pwa-fab.show { display:flex; }
         @media (max-width:420px) {
             #pwa-fab span { display:none; }
             #pwa-fab { padding:12px; border-radius:50%; }
@@ -70,7 +69,12 @@
 
     const fab = document.createElement('button');
     fab.id = 'pwa-fab';
-    fab.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg><span>Instalar app</span>`;
+    fab.innerHTML = `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+        <span>Instalar app</span>
+    `;
     document.body.appendChild(fab);
 
     /* ── Helpers ─────────────────────────────────────────────── */
@@ -83,28 +87,24 @@
 
     function setModalInstructions() {
         if (!modalBody) return;
+
         if (isSafari) {
             modalBody.innerHTML =
-                '1. Pulsa <strong>Compartir ↑</strong> en la barra inferior de Safari.<br><br>' +
-                '2. Desplázate y toca <strong>"Añadir a pantalla de inicio"</strong>.<br><br>' +
-                '3. Confirma con <strong>"Añadir"</strong>.';
+                '1. Pulsa <strong>Compartir ↑</strong> en Safari.<br><br>' +
+                '2. Toca <strong>Añadir a pantalla de inicio</strong>.<br><br>' +
+                '3. Confirma.';
         } else if (isIOS) {
             modalBody.innerHTML =
-                'Abre esta página en <strong>Safari</strong> y luego pulsa ' +
-                '<strong>Compartir ↑</strong> → <strong>"Añadir a pantalla de inicio"</strong>.';
+                'Abre en Safari y usa <strong>Compartir → Añadir a pantalla de inicio</strong>.';
         } else if (isChrome) {
             modalBody.innerHTML =
-                '1. Pulsa el menú <strong>⋮</strong> arriba a la derecha.<br><br>' +
-                '2. Toca <strong>"Instalar aplicación"</strong> o <strong>"Añadir a pantalla de inicio"</strong>.<br><br>' +
-                '3. Confirma en el diálogo.';
+                'Menú ⋮ → <strong>Instalar aplicación</strong> o <strong>Añadir a pantalla</strong>.';
         } else if (isFirefox) {
             modalBody.innerHTML =
-                '1. Pulsa el menú <strong>⋮</strong> de Firefox.<br><br>' +
-                '2. Toca <strong>"Instalar"</strong> o <strong>"Añadir a pantalla de inicio"</strong>.';
+                'Menú ⋮ → <strong>Instalar</strong>.';
         } else {
             modalBody.innerHTML =
-                'En el menú de tu navegador busca <strong>"Instalar aplicación"</strong> ' +
-                'o <strong>"Añadir a pantalla de inicio"</strong>.';
+                'Busca <strong>"Instalar aplicación"</strong> en tu navegador.';
         }
     }
 
@@ -112,7 +112,9 @@
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
+
             console.log('[PWA] outcome:', outcome);
+
             deferredPrompt = null;
             hideBanner();
             hideFab();
@@ -121,38 +123,54 @@
         }
     }
 
-    /* ── Eventos Chrome/Edge Android ────────────────────────── */
-    window.addEventListener('beforeinstallprompt', e => {
+    /* ── beforeinstallprompt (SOLO UNA VEZ) ─────────────────── */
+    window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
+
         console.log('[PWA] beforeinstallprompt capturado ✓');
+
         showBanner();
         showFab();
     });
 
+    /* ── app installed ───────────────────────────────────────── */
     window.addEventListener('appinstalled', () => {
-        hideBanner(); hideModal(); hideFab();
+        hideBanner();
+        hideModal();
+        hideFab();
         localStorage.setItem('pwa-installed', '1');
     });
 
-    /* ── Eventos botones ─────────────────────────────────────── */
+    /* ── Botones ─────────────────────────────────────────────── */
     if (btnInstall) btnInstall.addEventListener('click', triggerInstall);
-    if (btnDismiss) btnDismiss.addEventListener('click', () => { hideBanner(); localStorage.setItem('pwa-dismissed', 'session'); });
-    fab.addEventListener('click', triggerInstall);
-    if (modalClose) modalClose.addEventListener('click', hideModal);
-    if (modal) modal.addEventListener('click', e => { if (e.target === modal) hideModal(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') hideModal(); });
+    if (btnDismiss) btnDismiss.addEventListener('click', () => {
+        hideBanner();
+        localStorage.setItem('pwa-dismissed', 'session');
+    });
 
-    /* ── iOS: siempre mostrar FAB (no hay beforeinstallprompt) ─ */
+    fab.addEventListener('click', triggerInstall);
+
+    if (modalClose) modalClose.addEventListener('click', hideModal);
+
+    if (modal) modal.addEventListener('click', e => {
+        if (e.target === modal) hideModal();
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') hideModal();
+    });
+
+    /* ── iOS fallback ────────────────────────────────────────── */
     if (isIOS && !localStorage.getItem('pwa-dismissed')) {
         setTimeout(showFab, 2000);
     }
 
-    /* ── Otros navegadores: FAB manual si no hay prompt en 6s ─ */
+    /* ── fallback si no hay prompt ───────────────────────────── */
     if (!isIOS && !localStorage.getItem('pwa-dismissed')) {
         setTimeout(() => {
             if (!deferredPrompt) {
-                console.log('[PWA] Sin beforeinstallprompt — mostrando FAB manual');
+                console.log('[PWA] Sin prompt → mostrando FAB manual');
                 showFab();
             }
         }, 6000);

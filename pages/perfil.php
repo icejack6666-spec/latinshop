@@ -127,14 +127,8 @@ $page_title     = 'Mi Perfil | Latin Shop';
 $page_canonical = u('/perfil');
 include INCLUDES_PATH . '/header.php';
 
-$rol_info = [
-    'admin'    => ['label'=>'Administrador','class'=>'badge--purple','desc'=>'Tienes acceso total al panel de administración.'],
-    'verified' => ['label'=>'Cliente Verificado', 'class'=>'badge--blue',  'desc'=>'Cuenta verificada con teléfono. Acceso al foro y comentarios.'],
-    'client'   => ['label'=>'Usuario',             'class'=>'badge--green', 'desc'=>'Puedes comentar en páginas y acceder al foro.'],
-    'pending'  => ['label'=>'Pendiente',    'class'=>'badge--amber', 'desc'=>'Tu cuenta está esperando aprobación de un administrador.'],
-    'banned'   => ['label'=>'Suspendido',   'class'=>'badge--red',   'desc'=>'Tu cuenta ha sido suspendida.'],
-];
-$rol = $rol_info[$user_data['role']] ?? $rol_info['pending'];
+// DESPUÉS
+$rol = get_role_badge($user_data['role'], 'pf');
 
 $phone_masked = '';
 if (!empty($user_data['phone'])) {
@@ -551,7 +545,7 @@ if (!empty($user_data['phone'])) {
 }
 </style>
 
-<script <?= csp_nonce() ?>>
+<script <?= csp_nonce_attr() ?>>
 document.getElementById('avatar-input').addEventListener('change', function() {
     const file = this.files[0];
     if (!file) return;

@@ -2,8 +2,8 @@
     "name": "Latin Shop — Lords Mobile",
     "short_name": "Latin Shop",
     "description": "Servicios premium para Lords Mobile. Bots, gemas, recursos y herramientas.",
-    "start_url": "/latinshop/",
-    "scope": "/latinshop/",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
     "orientation": "portrait-primary",
     "background_color": "#080808",
@@ -13,29 +13,30 @@
 
     "icons": [
         {
-            "src": "/latinshop/assets/pwa/icon-96.png",
+            "src": "/assets/pwa/icon-96.png",
             "sizes": "96x96",
             "type": "image/png"
         },
         {
-            "src": "/latinshop/assets/pwa/icon-192.png",
+            "src": "/assets/pwa/icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/latinshop/assets/pwa/icon-512.png",
+            "src": "/assets/pwa/icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
     ],
 
     "shortcuts": [
+        
         {
             "name": "Tienda",
-            "url": "/latinshop/cuentas",
+            "url": "/cuentas",
             "icons": [
                 {
-                    "src": "/latinshop/assets/pwa/icon-96.png",
+                    "src": "/assets/pwa/icon-96.png",
                     "sizes": "96x96"
                 }
             ]

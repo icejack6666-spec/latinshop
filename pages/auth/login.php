@@ -198,6 +198,6 @@ $flash_ok = $auth->getFlash('success');
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <?php endif; ?>
 
-<script src="/latinshop/frontend/assets/js/auth-login.js" defer></script>
+<script src="/frontend/assets/js/auth-login.js" defer></script>
 
 <?php include INCLUDES_PATH . '/footer.php'; ?>

@@ -25,10 +25,10 @@ function secure_session_start(): void {
 }
 
 function set_security_headers(): void {
-
     if (headers_sent()) return;
 
     $nonce = generate_csp_nonce();
+    $GLOBALS['CSP_NONCE'] = $nonce;
 
     header_remove('Content-Security-Policy');
     header_remove('Content-Security-Policy-Report-Only');
@@ -116,10 +116,8 @@ function sanitize_url(string $url): string|false {
 
 function check_rate_limit(string $action, int $max = 5, int $window = 300): bool {
     $db  = Database::getInstance();
-    $ip  = $_SERVER['HTTP_CF_CONNECTING_IP'] 
-        ?? $_SERVER['REMOTE_ADDR'] 
-        ?? '0.0.0.0';
-    $ip  = filter_var($ip, FILTER_VALIDATE_IP) ?: '0.0.0.0';
+    // DESPUÉS
+    $ip  = IpHelper::getRealIP();
     $key = $action . ':' . $ip;
 
     $db->query(
@@ -253,5 +251,5 @@ function generate_csp_nonce(): string {
 }
 
 function csp_nonce_attr(): string {
-    return 'nonce="' . htmlspecialchars(generate_csp_nonce(), ENT_QUOTES, 'UTF-8') . '"';
+    return 'nonce="' . $GLOBALS['CSP_NONCE'] . '"';
 }

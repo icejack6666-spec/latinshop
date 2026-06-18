@@ -16,8 +16,13 @@ $_logueado    = $_auth->isLoggedIn();
 $_user_header = $_logueado ? $_auth->getUser() : null;
 
 $nombres = [
-    'cuentas' => 'Tienda de Cuentas',
-    'bots'    => 'Bots',
+    'login'           => 'Inicio de Sesión',
+    'register'        => 'Registro de Usuarios',
+    'forgot_password' => 'Recuperación de Contraseña',
+    'profile'         => 'Mi Perfil',
+    'cuentas'         => 'Tienda de Cuentas',
+    'bots'            => 'Bots',
+    'support'         => 'Soporte',
 ];
 $seccion = $nombres[$_GET['s'] ?? ''] ?? 'Esta sección';
 

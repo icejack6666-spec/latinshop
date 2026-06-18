@@ -193,13 +193,9 @@ class SessionManager
     // Helpers privados
     // -------------------------------------------------------------------------
 
+    // DESPUÉS
     private function resolveIp(): string
     {
-        $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
-           ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-           ?? $_SERVER['REMOTE_ADDR']
-           ?? '0.0.0.0';
-
-        return filter_var(explode(',', $ip)[0], FILTER_VALIDATE_IP) ?: '0.0.0.0';
+        return IpHelper::getRealIP();
     }
 }

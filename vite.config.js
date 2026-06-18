@@ -26,7 +26,7 @@ const SRC_JS  = 'frontend/assets/js';
 export default defineConfig(({ mode }) => ({
 
   root: '.',
-
+  base: '/',
   build: {
     outDir: 'frontend/assets/dist',
 

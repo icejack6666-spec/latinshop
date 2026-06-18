@@ -100,13 +100,13 @@ require_once INCLUDES_PATH . '/admin-sidebar.php';
             <div class="admin-stat-card">
                 <span class="admin-stat-label">Backups DB</span>
                 <span class="admin-stat-value"><?= $stats['total_db'] ?></span>
-                <span class="admin-stat-sub"><?= htmlspecialchars(adminFormatBytes($stats['size_db']), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="admin-stat-sub"><?= htmlspecialchars(format_bytes($stats['size_db']), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
 
             <div class="admin-stat-card">
                 <span class="admin-stat-label">Backups Archivos</span>
                 <span class="admin-stat-value"><?= $stats['total_files'] ?></span>
-                <span class="admin-stat-sub"><?= htmlspecialchars(adminFormatBytes($stats['size_files']), ENT_QUOTES, 'UTF-8') ?></span>
+                <span class="admin-stat-sub"><?= htmlspecialchars(format_bytes($stats['size_files']), ENT_QUOTES, 'UTF-8') ?></span>
             </div>
 
             <div class="admin-stat-card">
@@ -276,7 +276,7 @@ require_once INCLUDES_PATH . '/admin-sidebar.php';
                                         } elseif (isset($details['message'])) {
                                             echo htmlspecialchars($details['message'], ENT_QUOTES, 'UTF-8');
                                         } elseif (isset($details['deleted'])) {
-                                            echo "Eliminados: {$details['deleted']} | Liberados: " . adminFormatBytes((int)($details['freed_bytes'] ?? 0));
+                                            echo "Eliminados: {$details['deleted']} | Liberados: " . format_bytes((int)($details['freed_bytes'] ?? 0));
                                         }
                                         ?>
                                     </td>
@@ -294,11 +294,3 @@ require_once INCLUDES_PATH . '/admin-sidebar.php';
 
 <?php
 require_once INCLUDES_PATH . '/footer.php';
-
-function adminFormatBytes(int $bytes): string
-{
-    if ($bytes >= 1_073_741_824) return round($bytes / 1_073_741_824, 2) . ' GB';
-    if ($bytes >= 1_048_576)     return round($bytes / 1_048_576,     2) . ' MB';
-    if ($bytes >= 1024)          return round($bytes / 1024,          2) . ' KB';
-    return $bytes . ' B';
-}

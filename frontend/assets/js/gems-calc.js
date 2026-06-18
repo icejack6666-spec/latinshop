@@ -1,6 +1,6 @@
-
 (function() {
 
+document.addEventListener('DOMContentLoaded', () => {
 
     const PRECIOS_PODER = [
         [  789, 3.70],
@@ -31,7 +31,8 @@ function calcularUsd(total, precioBase) {
             document.querySelectorAll('.gem-vendedor').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentWA = btn.dataset.wa;
-            document.getElementById('wa-vendedor-nombre').textContent = btn.dataset.nombre;
+            const waName = document.getElementById('wa-vendedor-nombre');
+            if (waName) waName.textContent = btn.dataset.nombre;
             buildWALink();
         });
     });
@@ -235,4 +236,7 @@ function calcularUsd(total, precioBase) {
     }
 
     buildWALink();
+
+});
+
 })();

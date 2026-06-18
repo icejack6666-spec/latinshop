@@ -75,17 +75,8 @@ class ApiRateLimit
     }
 
 
-    private function getIp(): string
+     private function getIp(): string
     {
-        $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
-            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-            ?? $_SERVER['REMOTE_ADDR']
-            ?? '0.0.0.0';
-
-        if (str_contains($ip, ',')) {
-            $ip = trim(explode(',', $ip)[0]);
-        }
-
-        return filter_var($ip, FILTER_VALIDATE_IP) ?: '0.0.0.0';
+        return IpHelper::getRealIP();
     }
 }

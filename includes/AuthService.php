@@ -28,8 +28,8 @@ class AuthService
         string $password,
         string $password_confirm
     ): array {
-        $username = trim($username);
-        $email    = strtolower(trim($email));
+        $username = sanitize_string($username, 50);
+        $email    = sanitize_email($email);
 
         if (strlen($username) < 3 || strlen($username) > 50) {
             return ['success' => false, 'error' => 'El nombre de usuario debe tener entre 3 y 50 caracteres.'];
@@ -39,9 +39,10 @@ class AuthService
             return ['success' => false, 'error' => 'El usuario solo puede contener letras, números, guiones y puntos.'];
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+       if ($email === false) {
             return ['success' => false, 'error' => 'El email no es válido.'];
         }
+
 
         if (strlen($password) < 8) {
             return ['success' => false, 'error' => 'La contraseña debe tener al menos 8 caracteres.'];
@@ -84,8 +85,11 @@ class AuthService
 
     public function login(string $email, string $password, bool $remember_me = false): array
     {
-        $email = strtolower(trim($email));
-        $ip    = $this->resolveIp();
+        $email = sanitize_email($email);
+        if ($email === false) {
+            return ['success' => false, 'error' => 'Email o contraseña incorrectos.'];
+        }
+        $ip = $this->resolveIp();
 
         $intentosFallidos = $this->db->count(
             "SELECT COUNT(*) FROM login_attempts
@@ -252,13 +256,9 @@ class AuthService
     // Helper privado
     // =========================================================================
 
+    // DESPUÉS
     private function resolveIp(): string
     {
-        $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
-           ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-           ?? $_SERVER['REMOTE_ADDR']
-           ?? '0.0.0.0';
-
-        return filter_var(explode(',', $ip)[0], FILTER_VALIDATE_IP) ?: '0.0.0.0';
+        return IpHelper::getRealIP();
     }
 }

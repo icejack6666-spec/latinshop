@@ -224,14 +224,8 @@ include INCLUDES_PATH . '/header.php';
                         <?php else: ?>
                             <?php foreach ($usuarios as $u_row):
                                 $es_yo = ((int)$u_row['id'] === (int)$usuario['id']);
-                                $rol_labels = [
-                                    'pending'  => ['label' => 'Pendiente',  'class' => 'admin-badge--amber'],
-                                    'client'   => ['label' => 'Usuario',           'class' => 'admin-badge--green'],
-                                    'verified' => ['label' => 'Cliente Verificado','class' => 'admin-badge--blue'],
-                                    'admin'    => ['label' => 'Admin',      'class' => 'admin-badge--purple'],
-                                    'banned'   => ['label' => 'Baneado',    'class' => 'admin-badge--red'],
-                                ];
-                                $rol = $rol_labels[$u_row['role']] ?? ['label' => $u_row['role'], 'class' => ''];
+                                // DESPUÉS
+                                $rol = get_role_badge($u_row['role'], 'admin');
                             ?>
                             <tr <?= $es_yo ? 'class="admin-table__row--me"' : '' ?>>
 

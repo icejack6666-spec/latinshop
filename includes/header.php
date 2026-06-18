@@ -247,26 +247,21 @@ $_extra_css_list = (array)($extra_css ?? []);
                                 <?= htmlspecialchars($_user_header['email'], ENT_QUOTES, 'UTF-8') ?>
                             </span>
                             <?php
-                            $rol_badges = [
-                                'admin'    => ['txt' => 'Admin',              'cls' => 'hdr-badge--purple'],
-                                'client'   => ['txt' => 'Usuario',            'cls' => 'hdr-badge--green'],
-                                'verified' => ['txt' => 'Cliente Verificado', 'cls' => 'hdr-badge--blue'],
-                                'pending'  => ['txt' => 'Pendiente',          'cls' => 'hdr-badge--amber'],
-                                'banned'   => ['txt' => 'Baneado',            'cls' => 'hdr-badge--red'],
-                            ];
-                            $rb = $rol_badges[$_user_header['role']] ?? ['txt' => $_user_header['role'], 'cls' => ''];
+                            $rb = get_role_badge($_user_header['role'], 'hdr');
                             ?>
-                            <span class="hdr-badge <?= $rb['cls'] ?>"><?= $rb['txt'] ?></span>
+                            <span class="hdr-badge <?= $rb['class'] ?>"><?= $rb['label'] ?></span>
                         </div>
 
                         <div class="hdr-user__divider"></div>
 
+                        <?php if (feature('profile')): ?>
                         <a href="<?= u('/perfil') ?>" class="hdr-user__item" role="menuitem">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
                             </svg>
                             Mi perfil
                         </a>
+                        <?php endif; ?>
 
                         <?php if ($_user_header['role'] === 'admin'): ?>
                             <a href="<?= u('/admin') ?>" class="hdr-user__item hdr-user__item--admin" role="menuitem">
@@ -292,11 +287,15 @@ $_extra_css_list = (array)($extra_css ?? []);
                     </div><!-- /hdr-user__dropdown -->
                 </div><!-- /hdr-user -->
 
-            <?php else: ?>
+            <?php elseif (feature('login') || feature('register')): ?>
 
                 <div class="hdr-auth">
+                    <?php if (feature('login')): ?>
                     <a href="<?= u('/login') ?>" class="hdr-auth__login">Iniciar sesión</a>
+                    <?php endif; ?>
+                    <?php if (feature('register')): ?>
                     <a href="<?= u('/registrar') ?>" class="hdr-auth__registro">Registrarse</a>
+                    <?php endif; ?>
                 </div>
 
             <?php endif; ?>
@@ -358,9 +357,8 @@ $_extra_css_list = (array)($extra_css ?? []);
 </button>
 
 <div id="pwa-manual-modal" role="dialog" aria-modal="true" aria-labelledby="pwa-modal-title">
-    <div class="pwa-modal__box">
-        <p class="pwa-modal__title" id="pwa-modal-title">📲 Instalar Latin Shop</p>
-        <p class="pwa-modal__body" id="pwa-modal-body"></p>
-        <button class="pwa-modal__close" id="pwa-modal-close" type="button">Entendido</button>
-    </div>
+    <div class="pwa-banner">
+  📲 Instala la app para mejor experiencia
+  <button>Instalar</button>
+</div>
 </div>

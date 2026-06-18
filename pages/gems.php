@@ -680,10 +680,10 @@ include INCLUDES_PATH . '/header.php';
 }
 </style>
 
-<script <?= csp_nonce() ?>>
+<script <?= csp_nonce_attr() ?>>
 window.LATINSHOP_CONFIG = { whatsappNumber: "<?= htmlspecialchars(WHATSAPP_NUMBER, ENT_QUOTES, 'UTF-8') ?>" };
 </script>
-<script src="/latinshop/frontend/assets/js/gems-calc.js" defer></script>
+<script src="<?= SITE_URL ?>/frontend/assets/js/gems-calc.js" defer></script>
 
 <?php include INCLUDES_PATH . '/footer.php'; ?>
 <?php include INCLUDES_PATH . '/comments-widget.php'; ?>

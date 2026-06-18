@@ -47,7 +47,7 @@ cat ~/.ssh/latinshop_deploy
 
 ## Variables de entorno en el servidor
 
-El servidor debe tener un archivo `/var/www/latinshop/.env` con:
+El servidor debe tener un archivo `/var/www/.env` con:
 
 ```
 APP_ENV=production

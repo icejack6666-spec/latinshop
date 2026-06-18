@@ -95,9 +95,22 @@ function avatar_url(?string $url): string {
 }
 
 define('FEATURES', [
-    'cuentas' => true,
-    'bots'    => true,
-    'support' => true,
+    // ── Autenticación ─────────────────────────────────────────────
+    'login'           => false,   // Página /login
+    'register'        => false,   // Página /registrar
+    'forgot_password' => false,   // Página /recuperar-password
+
+    // ── Usuarios ──────────────────────────────────────────────────
+    'profile'         => false,   // Páginas /perfil y /perfil/seguridad
+    'notifications'   => false,   // Reserva futura (sin efecto en código aún)
+    'sessions'        => false,   // Reserva futura (sin efecto en código aún)
+
+    // ── Tienda ────────────────────────────────────────────────────
+    'cuentas'         => false,   // Páginas /cuentas y /cuentas/ver
+    'bots'            => true,   // Páginas /bots y sub-páginas
+
+    // ── Soporte ───────────────────────────────────────────────────
+    'support'         => true,   // Páginas /support y sub-páginas
 ]);
 
 function feature(string $name): bool {

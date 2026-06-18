@@ -42,6 +42,7 @@ if (!file_exists($rootPath . '/config/config.php')) {
 require_once $rootPath . '/config/config.php';
 require_once INCLUDES_PATH . '/Database.php';
 require_once INCLUDES_PATH . '/Backup/BackupService.php';
+require_once INCLUDES_PATH . '/helpers.php';
 
 // ── Parsear argumento ──────────────────────────────────────────────────────
 $command = $argv[1] ?? 'full';
@@ -77,7 +78,7 @@ switch ($command) {
 
     case 'purge':
         $result = $service->purgeOld();
-        echo "[OK] Purgados: {$result['deleted']} archivos, liberados: " . formatBytes($result['freed_bytes']) . "\n";
+        echo "[OK] Purgados: {$result['deleted']} archivos, liberados: " . format_bytes($result['freed_bytes']) . "\n";
         exit(0);
 
     case 'list':
@@ -134,14 +135,8 @@ function printResult(array $result): void
         echo "      Files file: {$result['files_file']}\n";
     }
     if (!empty($result['file'])) {
-        echo "      File: {$result['file']} (" . formatBytes($result['size'] ?? 0) . ")\n";
+        echo "      File: {$result['file']} (" . format_bytes($result['size'] ?? 0) . ")\n";
     }
 }
 
-function formatBytes(int $bytes): string
-{
-    if ($bytes >= 1_073_741_824) return round($bytes / 1_073_741_824, 2) . ' GB';
-    if ($bytes >= 1_048_576)     return round($bytes / 1_048_576,     2) . ' MB';
-    if ($bytes >= 1024)          return round($bytes / 1024,          2) . ' KB';
-    return $bytes . ' B';
-}
+

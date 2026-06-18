@@ -26,6 +26,8 @@ require_once $root . '/config/config.php';
 require_once $root . '/includes/security.php';
 require_once $root . '/includes/seguridad_vistas.php';
 require_once $root . '/includes/Database.php';
+require_once INCLUDES_PATH . '/Security/IpHelper.php';
+require_once INCLUDES_PATH . '/helpers.php';
 require_once $root . '/includes/Auth.php';
 require_once $root . '/includes/AuditLog.php';
 require_once $root . '/includes/Notifications.php';

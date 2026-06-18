@@ -18,7 +18,10 @@ class PasswordResetService
      */
     public function createPasswordResetToken(string $email): string|false
     {
-        $email = strtolower(trim($email));
+        $email = sanitize_email($email);
+        if ($email === false) {
+            return false;
+        }
 
         $user = $this->db->fetch(
             "SELECT id FROM users WHERE email = ? AND role != 'banned' LIMIT 1",

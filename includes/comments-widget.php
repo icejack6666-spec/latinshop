@@ -326,7 +326,18 @@ foreach ($lista_comentarios as $c) {
 @media(max-width:640px){.cw-form-wrap{flex-direction:column}.cw-form-footer{flex-direction:column;align-items:flex-start}.cw-btn-enviar{width:100%;text-align:center}.cw-header{flex-direction:column}}
 </style>
 
-<script>
+<script <?= csp_nonce_attr() ?>>
+(function(){
+    const ta=document.getElementById('cw-textarea');
+    const ch=document.getElementById('cw-chars');
+    if(!ta||!ch)return;
+    ta.addEventListener('input',function(){
+        const len=this.value.length;
+        ch.textContent=len;
+        ch.style.color=len>900?'var(--tbt-amber)':len>=1000?'#f87171':'';
+    });
+})();
+
 (function(){
     const ta=document.getElementById('cw-textarea');
     const ch=document.getElementById('cw-chars');

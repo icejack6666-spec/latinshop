@@ -129,13 +129,18 @@ final class SupportTicketServiceTest extends TestCase
         $this->assertStringContainsString('KB', $result);
         $this->assertStringContainsString('2', $result);
     }
-
+    // DESPUÉS
     public function testFormatBytesMegabytes(): void
     {
-        $result = \SupportTicketService::formatBytes(5 * 1024 * 1024);
-        $this->assertStringContainsString('MB', $result);
-        $this->assertStringContainsString('5', $result);
+        $this->assertSame('5.00 MB', \SupportTicketService::formatBytes(5 * 1024 * 1024));
     }
+
+    public function testFormatBytesGigabytes(): void
+    {
+        $this->assertSame('2.00 GB', \SupportTicketService::formatBytes(2 * 1024 * 1024 * 1024));
+    }
+
+    
 
     public function testFormatBytesZero(): void
     {

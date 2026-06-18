@@ -22,6 +22,7 @@ if (!defined('LATINSHOP')) die('Acceso directo no permitido.');
                 </p>
             </div>
 
+            <?php if (feature('bots')): ?>
             <div>
                 <p class="tbt-footer__col-title">Servicios</p>
                 <ul class="tbt-footer__links">
@@ -29,6 +30,7 @@ if (!defined('LATINSHOP')) die('Acceso directo no permitido.');
                     <li><a href="<?= u('/bots/bot-whatsapp') ?>">Bot WhatsApp</a></li>
                 </ul>
             </div>
+            <?php endif; ?>
 
             <div>
                 <p class="tbt-footer__col-title">Herramientas</p>

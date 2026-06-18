@@ -19,10 +19,8 @@ class AuditLog {
                     $targetId,
                     $oldValue ? json_encode($oldValue) : null,
                     $newValue ? json_encode($newValue) : null,
-                    filter_var(
-                        explode(',', $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0')[0],
-                        FILTER_VALIDATE_IP
-                    ) ?: '0.0.0.0',
+                    // DESPUÉS
+                    IpHelper::getRealIP(),
                 ]
             );
         } catch (\Exception $e) {

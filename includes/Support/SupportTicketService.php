@@ -352,11 +352,10 @@ class SupportTicketService
     /**
      * Formato legible de bytes.
      */
+
     public static function formatBytes(int $bytes): string
     {
-        if ($bytes < 1024) return $bytes . ' B';
-        if ($bytes < 1_048_576) return round($bytes / 1024, 1) . ' KB';
-        return round($bytes / 1_048_576, 1) . ' MB';
+        return format_bytes($bytes);
     }
 
     // ─── PRIVADO ──────────────────────────────────────────────────────────────

@@ -241,13 +241,17 @@ class Comments
         }
     }
 
+    // DESPUÉS
     public static function getInitials(string $username): string
     {
         $partes = explode(' ', trim($username));
         if (count($partes) >= 2) {
-            return mb_strtoupper(mb_substr($partes[0], 0, 1) . substr($partes[1], 0, 1));
+            return mb_strtoupper(
+                mb_substr($partes[0], 0, 1, 'UTF-8') . mb_substr($partes[1], 0, 1, 'UTF-8'),
+                'UTF-8'
+            );
         }
-        return mb_strtoupper(mb_substr($username, 0, 2));
+        return mb_strtoupper(mb_substr($username, 0, 2, 'UTF-8'), 'UTF-8');
     }
 
     public static function slugToLabel(string $slug): string

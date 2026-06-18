@@ -20,6 +20,7 @@ require_once INCLUDES_PATH . '/Security/BotDetector.php';
 require_once INCLUDES_PATH . '/Security/SecurityLogger.php';
 require_once INCLUDES_PATH . '/Security/RateLimiter.php';
 require_once INCLUDES_PATH . '/Security/InputScanner.php';
+require_once INCLUDES_PATH . '/helpers.php';
 require_once INCLUDES_PATH . '/Security/Security.php';
 
 require_once INCLUDES_PATH . '/AuditLog.php';
@@ -70,8 +71,6 @@ $routes = [
     'bots/bot-farming'                      => 'pages/bots/bot-farming.php',
     'bots/bot-whatsapp'                     => 'pages/bots/bot-whatsapp.php',
     'bots/farming-config'                   => 'pages/bots/farming-config.php',
-    'bots/farming-save'                     => 'includes/ajax/farming-save.php',
-
     'gems'                                  => 'pages/gems.php',
 
     'utilidades'                            => 'pages/utilidades/index.php',
@@ -121,9 +120,20 @@ $routes = [
 ];
 
 $feature_routes = [
-    'cuentas'            => ['cuentas', 'cuentas/ver'],
-    'bots'               => ['bots', 'bots/bot-farming', 'bots/bot-whatsapp', 'bots/farming-config'],
-    'support'            => ['support', 'support/ver', 'support/attachment'],
+    // Autenticación — bloquear el index de cada sección bloquea el flujo completo
+    'login'           => ['login'],
+    'register'        => ['registrar'],
+    'forgot_password' => ['recuperar-password'],
+
+    // Usuarios
+    'profile'         => ['perfil', 'perfil/seguridad'],
+
+    // Tienda
+    'cuentas'         => ['cuentas', 'cuentas/ver'],
+    'bots'            => ['bots', 'bots/bot-farming', 'bots/bot-whatsapp', 'bots/farming-config'],
+
+    // Soporte
+    'support'         => ['support', 'support/ver', 'support/attachment'],
 ];
 
 foreach ($feature_routes as $feature_name => $blocked_paths) {
